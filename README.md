@@ -1,59 +1,145 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
-
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <a href="https://github.com/rostam-sodagari/glide">
+    <img src="https://img.shields.io/badge/Laravel-12-green.svg" alt="Laravel 12">
+    <img src="https://img.shields.io/badge/PHP-8.2+-blue.svg" alt="PHP 8.2+">
+    <img src="https://img.shields.io/badge/Docker-support-orange.svg" alt="Docker">
+    <img src="https://img.shields.io/badge/License-MIT-brightgreen.svg" alt="License">
+  </a>
 </p>
 
-## About Laravel
+<h1 align="center">Glide 🚀</h1>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+<p align="center">
+  A self‑hosted deployment and management platform for small and medium‑sized web applications.
+</p>
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Overview
 
-## Learning Laravel
+**Glide** is a backend‑centric platform built with **Laravel**, designed to help teams deploy, manage, and monitor applications on VPS or cloud platforms such as **AWS** and **GCP**.  
+It provides a streamlined developer experience similar in spirit to **Laravel Forge** and **Coolify**, with an emphasis on clean architecture, automation, and operational clarity.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Objectives
 
-## Laravel Sponsors
+- Provide a sensible default deployment flow for Laravel and containerised apps.  
+- Automate repetitive tasks such as installing dependencies and running migrations.  
+- Keep configurations and secrets neatly organised by environment.  
+- Offer visibility into deployment history and system health.  
+- Integrate smoothly into modern workflows with Git, containers, and CI/CD.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
 
-### Premium Partners
+## Planned Features
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Projects & Environments
+- Manage multiple environments (e.g. development, staging, production).
+- Configure unique deployment settings per environment.
 
-## Contributing
+### Git Integration
+- Connect repositories from **GitHub** or **GitLab**.  
+- Trigger deployments via webhooks or from the UI.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Deployment Pipeline (Laravel‑focused)
+- Clone from Git remotes and install Composer/NPM dependencies.  
+- Run automated tests before deployment.  
+- Apply migrations and optimisation commands.  
+- Support rollbacks if deployment fails.
 
-## Code of Conduct
+### Containers
+- Deploy with **Docker** or **Docker Compose**.  
+- Run non‑PHP services as container images alongside your Laravel apps.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Monitoring & Logs
+- Perform basic health checks for deployed services.  
+- View deployment history, status, and timestamps.  
+- Access recent deployment logs directly from the interface.
 
-## Security Vulnerabilities
+### Configuration & Secrets
+- Store environment variables and secrets in encrypted form.  
+- Keep environment‑specific configurations isolated and updatable.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+
+## Technology Stack
+
+### Backend
+- **Laravel** (PHP)  
+- **MySQL**, **PostgreSQL**, or **SQL Server**  
+- **Redis** for queues and caching  
+
+### Infrastructure & DevOps
+- **Docker** & **Docker Compose**  
+- **Kubernetes** (planned)  
+- **Cloud Integrations:**  
+  - AWS (planned)  
+  - Google Cloud Platform (planned)  
+- **CI/CD Support:**  
+  - GitHub Actions  
+  - GitLab CI  
+
+### Languages
+- **PHP**  
+- **JavaScript / TypeScript**  
+- **SQL**
+
+
+## Roadmap
+
+### MVP
+- User authentication and session management.  
+- Basic project & environment management.  
+- Deploy Laravel apps to a single VPS.  
+- Display deployment logs and status.
+
+### v1.0
+- GitHub & GitLab repository integration.  
+- Docker‑based deployment.  
+- UI for environment variables & secrets.  
+- Health checks and monitoring views.
+
+### v1.x
+- Billing and subscriptions via Stripe & PayPal.  
+- Enhanced AWS/GCP integration.  
+- Advanced metrics and alerts.  
+- Kubernetes deployment support.
+
+
+## Local Development
+
+**Setup (subject to change):**
+
+1. Clone the repository:
+   
+   ```bash
+   git clone https://github.com/rostam-sodagari/glide.git
+   cd glide
+    ```
+2. Copy the environment file:
+   
+    ```bass
+    .example .env
+    ```
+
+3. Configure your database and Redis credentials.
+4. Install dependencies:
+    ```bash
+    composer install
+    npm install
+    ```
+5. Run migrations:
+    ```bash
+    php artisan migrate
+    ```
+
+6. Start the stack:
+    ```bash
+    docker-compose up -d
+    ```
+    or
+    ```bash
+    php artisan serve
+    ```
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+MIT © Rostam Sodagari

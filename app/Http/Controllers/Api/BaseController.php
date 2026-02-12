@@ -9,6 +9,8 @@ class BaseController extends Controller
 {
     /**
      * Success response with data.
+     *
+     * @param  mixed  $data
      */
     protected function success($data = [], int $code = 200, array $headers = []): JsonResponse
     {

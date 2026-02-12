@@ -13,8 +13,9 @@ return [
     |
     */
 
-    'failed' => 'These credentials do not match our records.',
-    'password' => 'The provided password is incorrect.',
-    'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
+    'failed' => 'Invalid credentials.',
+    'throttled' => 'Too many attempts. Try again in :seconds seconds.',
+    'pwned_password' => 'Password has been compromised elsewhere.',
+    'registered_verify' => 'Registration successful. Please verify your email.',
 
 ];

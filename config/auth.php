@@ -112,4 +112,20 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /**
+     * API authentication configuration
+     *
+     * Defines the authentication driver and settings for API requests.
+     * This configuration is used to authenticate users accessing the application
+     * through API endpoints.
+     */
+    'api' => [
+        'rate_limit_attempts' => env('API_RATE_LIMIT_ATTEMPTS', 5),
+        'rate_limit_decay' => env('API_RATE_LIMIT_DECAY', 60),  // seconds
+        'token_expiry_days' => env('TOKEN_EXPIRY_DAYS', 7),
+        'max_device_tokens' => env('MAX_DEVICE_TOKENS', 5),
+        'pwned_password_check' => env('PWNPASSWORD_CHECK', true),
+        'uncompromised_threshold' => env('UNCOMPROMISED_THRESHOLD', 1),  // Breaches before fail
+    ],
+
 ];

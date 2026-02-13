@@ -8,7 +8,6 @@ use App\Http\Requests\Api\Auth\RegisterRequest;
 use App\Services\Auth\AuthService;
 use Illuminate\Auth\Events\Authenticated;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -43,19 +42,19 @@ class AuthenticationController extends BaseController
     {
         try {
             $result = $this->authService->register($request->validated());
+
             return $this->success([], 201, [], $result['message']);
         } catch (ValidationException $e) {
             return $this->validationError($e->errors());
         }
     }
 
-
     /**
      * Log out the authenticated user.
      *
      * Invalidates the user's current session and returns a JSON response.
      *
-     * @param Request $request The incoming HTTP request
+     * @param  Request  $request  The incoming HTTP request
      * @return JsonResponse The JSON response indicating logout status
      */
     public function logout(Request $request): JsonResponse

@@ -33,8 +33,8 @@ class RateLimitService
     /**
      * Get the throttle key for rate limiting.
      *
-     * @param string $action The action to throttle (e.g., 'login', 'register', 'password-reset')
-     * @param Request $request The HTTP request instance
+     * @param  string  $action  The action to throttle (e.g., 'login', 'register', 'password-reset')
+     * @param  Request  $request  The HTTP request instance
      * @return string The throttle key used to identify and track rate limit attempts
      */
     public function getThrottleKey(string $action, Request $request): string

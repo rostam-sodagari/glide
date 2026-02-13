@@ -61,8 +61,8 @@ class VerificationService
     /**
      * Retrieve a user for verification purposes.
      *
-     * @param mixed $id The user identifier (ID or other identifying information)
-     * @param string|null $hash The verification hash, if applicable
+     * @param  mixed  $id  The user identifier (ID or other identifying information)
+     * @param  string|null  $hash  The verification hash, if applicable
      * @return User The user object to be verified
      */
     private function getVerifyingUser(mixed $id, ?string $hash): User

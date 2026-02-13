@@ -23,7 +23,7 @@ class RateLimitService
         if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
             $seconds = RateLimiter::availableIn($key);
             throw ValidationException::withMessages([
-                'email' => trans('auth.throttled', ['seconds' => $seconds]),
+                'throttle' => trans('auth.throttled', ['seconds' => $seconds]),
             ]);
         }
 

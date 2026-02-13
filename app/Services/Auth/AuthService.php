@@ -26,7 +26,6 @@ class AuthService
     {
         $this->rateLimiter->throttle('register', $this->request);
 
-        $data['email'] = strtolower(trim($data['email']));
         $data['password'] = $this->securePassword($data['password']);
         unset($data['device_name']);
 
@@ -85,6 +84,25 @@ class AuthService
         );
 
         return ['user' => $user->makeVisible(['email']), 'token' => $token];
+    }
+
+   
+    /**
+     * Log out a user from the application.
+     *
+     * @param User|null $user The user to log out. If null, logs out the current authenticated user.
+     * @return void
+     */
+    public function logout(?User $user): void
+    {
+        if (! $user instanceof User) {
+            return;
+        }
+
+        $token = $user->currentAccessToken();
+        if ($token) {
+            $token->delete();
+        }
     }
 
     /**

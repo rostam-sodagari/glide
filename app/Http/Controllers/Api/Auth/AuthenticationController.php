@@ -59,13 +59,7 @@ class AuthenticationController extends BaseController
      */
     public function logout(Request $request): JsonResponse
     {
-        $user = $request->user();
-        if ($user) {
-            $token = $user->currentAccessToken();
-            if ($token) {
-                $token->delete();
-            }
-        }
+        $this->authService->logout($request->user());
 
         return $this->success();
     }

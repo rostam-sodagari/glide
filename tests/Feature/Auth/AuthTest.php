@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\ValidationException;
+
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\getJson;
@@ -217,7 +218,7 @@ it('throttles registration attempts more than allowed', function () {
         ->postJson(AUTH_BASE_URL.'/register', $payload);
 
     $response->assertStatus(422)
-        ->assertJsonValidationErrors(['email']);
+        ->assertJsonValidationErrors(['throttle']);
 })->group('authentication');
 
 it('resends verification email for unverified user', function () {
@@ -254,7 +255,7 @@ it('throttles resend verification requests more than allowed', function () {
         ->postJson(AUTH_BASE_URL.'/resend-verification', ['email' => $user->email]);
 
     $response->assertStatus(422)
-        ->assertJsonValidationErrors(['email']);
+        ->assertJsonValidationErrors(['throttle']);
 })->group('verification');
 
 it('verifies valid signed email link', function () {
@@ -293,7 +294,7 @@ it('throttles verification attempts more than allowed', function () {
     $response = withServerVariables(['REMOTE_ADDR' => $ip])->getJson($signedUrl);
 
     $response->assertStatus(422)
-        ->assertJsonValidationErrors(['email']);
+        ->assertJsonValidationErrors(['throttle']);
 })->group('verification');
 
 it('fails verification with invalid hash', function () {

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Laravel\Sanctum\PersonalAccessToken;
+use Illuminate\Auth\Events\Authenticated;
 
 class AuthService
 {
@@ -66,7 +67,7 @@ class AuthService
         $user = Auth::user();
 
         event(new Authenticated('api', $user));
-        
+
         if (! $user->hasVerifiedEmail()) {
             throw ValidationException::withMessages(['email_verification' => __('verification.not_verified')]);
         }

@@ -86,12 +86,10 @@ class AuthService
         return ['user' => $user->makeVisible(['email']), 'token' => $token];
     }
 
-
     /**
      * Log out a user from the application.
      *
-     * @param User|null $user The user to log out. If null, logs out the current authenticated user.
-     * @return void
+     * @param  User|null  $user  The user to log out. If null, logs out the current authenticated user.
      */
     public function logout(?User $user): void
     {

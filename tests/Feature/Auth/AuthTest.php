@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use App\Services\Auth\RateLimitService;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
@@ -235,6 +236,125 @@ it('resends verification email for unverified user', function () {
         ->assertJson(['success' => true, 'message' => 'Success']);
     Notification::assertSentTo($user, VerifyEmail::class);
 })->group('verification');
+
+it('validates forgot password input', function () {
+    $response = postJson(AUTH_BASE_URL.'/forgot-password', [
+        'email' => 'invalid-email',
+    ]);
+
+    $response->assertStatus(422)
+        ->assertJsonValidationErrors(['email']);
+})->group('authentication');
+
+it('sends password reset link for existing user', function () {
+    Notification::fake();
+    $user = User::factory()->create();
+
+    $response = postJson(AUTH_BASE_URL.'/forgot-password', [
+        'email' => $user->email,
+    ]);
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'success' => true,
+            'message' => __('passwords.sent'),
+            'data' => ['email' => $user->email],
+        ]);
+
+    Notification::assertSentTo($user, ResetPassword::class);
+})->group('authentication');
+
+it('resets password with valid token', function () {
+    Notification::fake();
+    $user = User::factory()->create([
+        'password' => bcrypt('OldPassword123!'),
+    ]);
+
+    postJson(AUTH_BASE_URL.'/forgot-password', [
+        'email' => $user->email,
+    ]);
+
+    $token = null;
+    Notification::assertSentTo($user, ResetPassword::class, function ($notification) use (&$token) {
+        $token = $notification->token;
+
+        return true;
+    });
+
+    $response = postJson(AUTH_BASE_URL.'/reset-password', [
+        'email' => $user->email,
+        'token' => $token,
+        'password' => 'Str0ngP@ssw0rd!2026',
+        'password_confirmation' => 'Str0ngP@ssw0rd!2026',
+    ]);
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'success' => true,
+            'message' => __('passwords.reset'),
+            'data' => ['email' => $user->email],
+        ]);
+
+    expect(Hash::check('Str0ngP@ssw0rd!2026', $user->fresh()->password))->toBeTrue();
+})->group('authentication');
+
+it('fails reset with invalid token', function () {
+    $user = User::factory()->create();
+
+    $response = postJson(AUTH_BASE_URL.'/reset-password', [
+        'email' => $user->email,
+        'token' => 'invalid-token',
+        'password' => 'Str0ngP@ssw0rd!2026',
+        'password_confirmation' => 'Str0ngP@ssw0rd!2026',
+    ]);
+
+    $response->assertStatus(422)
+        ->assertJsonValidationErrors(['token']);
+})->group('authentication');
+
+it('throttles forgot password attempts more than allowed', function () {
+    Config::set('auth.api.rate_limit_attempts.forgot-password', 2);
+    Config::set('auth.api.rate_limit_decay.forgot-password', 60);
+
+    $user = User::factory()->create();
+    $ip = '127.0.0.5';
+
+    withServerVariables(['REMOTE_ADDR' => $ip])
+        ->postJson(AUTH_BASE_URL.'/forgot-password', ['email' => $user->email]);
+    withServerVariables(['REMOTE_ADDR' => $ip])
+        ->postJson(AUTH_BASE_URL.'/forgot-password', ['email' => $user->email]);
+
+    $response = withServerVariables(['REMOTE_ADDR' => $ip])
+        ->postJson(AUTH_BASE_URL.'/forgot-password', ['email' => $user->email]);
+
+    $response->assertStatus(422)
+        ->assertJsonValidationErrors(['throttle']);
+})->group('authentication');
+
+it('throttles reset password attempts more than allowed', function () {
+    Config::set('auth.api.rate_limit_attempts.reset-password', 2);
+    Config::set('auth.api.rate_limit_decay.reset-password', 60);
+
+    $user = User::factory()->create();
+    $payload = [
+        'email' => $user->email,
+        'token' => 'invalid-token',
+        'password' => 'Str0ngP@ssw0rd!2026',
+        'password_confirmation' => 'Str0ngP@ssw0rd!2026',
+    ];
+
+    $ip = '127.0.0.6';
+    withServerVariables(['REMOTE_ADDR' => $ip])
+        ->postJson(AUTH_BASE_URL.'/reset-password', $payload);
+    withServerVariables(['REMOTE_ADDR' => $ip])
+        ->postJson(AUTH_BASE_URL.'/reset-password', $payload);
+
+    $response = withServerVariables(['REMOTE_ADDR' => $ip])
+        ->postJson(AUTH_BASE_URL.'/reset-password', $payload);
+
+    $response->assertStatus(422)
+        ->assertJsonValidationErrors(['throttle']);
+})->group('authentication');
 
 it('throttles resend verification requests more than allowed', function () {
     Config::set('auth.api.rate_limit_attempts.resend-verification', 2);

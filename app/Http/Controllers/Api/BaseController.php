@@ -12,12 +12,12 @@ class BaseController extends Controller
      *
      * @param  mixed  $data
      */
-    protected function success($data = [], int $code = 200, array $headers = []): JsonResponse
+    protected function success($data = [], int $code = 200, array $headers = [], ?string $message = null): JsonResponse
     {
         return response()->json([
             'success' => true,
             'data' => $data,
-            'message' => 'Success',
+            'message' => $message ?? 'Success',
         ], $code, $headers);
     }
 

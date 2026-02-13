@@ -124,7 +124,7 @@ return [
         'rate_limit_decay' => env('API_RATE_LIMIT_DECAY', 60),  // seconds
         'token_expiry_days' => env('TOKEN_EXPIRY_DAYS', 7),
         'max_device_tokens' => env('MAX_DEVICE_TOKENS', 5),
-        'pwned_password_check' => env('PWNPASSWORD_CHECK', true),
+        'password_uncompromised_check' => env('PASSWORD_UNCOMPROMISED_CHECK', true),
         'uncompromised_threshold' => env('UNCOMPROMISED_THRESHOLD', 1),  // Breaches before fail
     ],
 

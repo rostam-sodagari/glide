@@ -3,6 +3,7 @@
 namespace App\Services\Auth;
 
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -33,6 +34,7 @@ class AuthService
 
         if (! $exists) {
             $user = User::create($data);
+            event(new Registered($user));
             $user->sendEmailVerificationNotification();
         }
 
@@ -62,6 +64,9 @@ class AuthService
         }
 
         $user = Auth::user();
+
+        event(new Authenticated('api', $user));
+        
         if (! $user->hasVerifiedEmail()) {
             throw ValidationException::withMessages(['email_verification' => __('verification.not_verified')]);
         }

@@ -15,13 +15,14 @@ class VerificationService
     ) {}
 
     /**
-    * Verify the user's email address.
-    *
-    * @param  mixed  $userOrId  The user instance or user ID to verify
-    * @param  string|null  $hash  The hash to validate the verification request (optional if user instance is provided)
-    * @return User The verified user instance
-    * @throws ValidationException If the verification fails due to invalid token or already verified email
-    */
+     * Verify the user's email address.
+     *
+     * @param  mixed  $userOrId  The user instance or user ID to verify
+     * @param  string|null  $hash  The hash to validate the verification request (optional if user instance is provided)
+     * @return User The verified user instance
+     *
+     * @throws ValidationException If the verification fails due to invalid token or already verified email
+     */
     public function verify(mixed $userOrId = null, ?string $hash = null): User
     {
         $this->rateLimiter->throttle('verify-email', $this->request);
@@ -41,11 +42,10 @@ class VerificationService
     }
 
     /**
-    * Resend the email verification notification to the user.
-    *
-    * @param  string  $email  The email address of the user to resend the verification email to
-    * @return void
-    */
+     * Resend the email verification notification to the user.
+     *
+     * @param  string  $email  The email address of the user to resend the verification email to
+     */
     public function resendVerification(string $email): void
     {
         $this->rateLimiter->throttle('resend-verification', $this->request);
@@ -58,7 +58,13 @@ class VerificationService
         $user->sendEmailVerificationNotification();
     }
 
-    
+    /**
+     * Retrieve a user for verification purposes.
+     *
+     * @param mixed $id The user identifier (ID or other identifying information)
+     * @param string|null $hash The verification hash, if applicable
+     * @return User The user object to be verified
+     */
     private function getVerifyingUser(mixed $id, ?string $hash): User
     {
         $user = User::findOrFail($id);

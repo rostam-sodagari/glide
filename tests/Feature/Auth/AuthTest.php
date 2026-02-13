@@ -10,16 +10,20 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\ValidationException;
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\assertDatabaseMissing;
+use function Pest\Laravel\getJson;
+use function Pest\Laravel\postJson;
+use function Pest\Laravel\withHeader;
+use function Pest\Laravel\withServerVariables;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
-    $this->baseUrl = '/api/v1/auth';
-});
+const AUTH_BASE_URL = '/api/v1/auth';
 
 it('validates registration input', function () {
     // Attempt to register with invalid data
-    $response = $this->postJson("{$this->baseUrl}/register", [
+    $response = postJson(AUTH_BASE_URL.'/register', [
         'name' => '',
         'email' => 'invalid-email',
         'password' => 'short',
@@ -32,7 +36,7 @@ it('validates registration input', function () {
 it('registers a user with valid input', function () {
     Notification::fake();
 
-    $response = $this->postJson("{$this->baseUrl}/register", [
+    $response = postJson(AUTH_BASE_URL.'/register', [
         'name' => 'Test User',
         'email' => 'testuser@example.com',
         'password' => 'SecUreP@ssw0rd',
@@ -45,7 +49,7 @@ it('registers a user with valid input', function () {
             'message' => __('verification.verification_sent'),
         ]);
 
-    $this->assertDatabaseHas('users', [
+    assertDatabaseHas('users', [
         'email' => 'testuser@example.com',
     ]);
 
@@ -61,7 +65,7 @@ it('does not create duplicate user on registration', function () {
         'email' => 'test@example.com',
     ]);
 
-    $response = $this->postJson("{$this->baseUrl}/register", [
+    $response = postJson(AUTH_BASE_URL.'/register', [
         'name' => 'Test',
         'email' => 'test@example.com',
         'password' => 'SecUreP@ssw0rd',
@@ -79,7 +83,7 @@ it('does not create duplicate user on registration', function () {
 })->group('authentication');
 
 it('validates login input', function () {
-    $response = $this->postJson("{$this->baseUrl}/login", [
+    $response = postJson(AUTH_BASE_URL.'/login', [
         'email' => 'invalid-email',
         'password' => '',
     ]);
@@ -89,7 +93,7 @@ it('validates login input', function () {
 })->group('authentication');
 
 it('fails login for non-existing user', function () {
-    $response = $this->postJson("{$this->baseUrl}/login", [
+    $response = postJson(AUTH_BASE_URL.'/login', [
         'email' => 'missing@example.com',
         'password' => 'whatever',
     ]);
@@ -106,7 +110,7 @@ it('logs in a verified user successfully', function () {
     ]);
 
     // Attempt login
-    $response = $this->postJson("{$this->baseUrl}/login", [
+    $response = postJson(AUTH_BASE_URL.'/login', [
         'email' => $user->email,
         'password' => 'SecUreP@ssw0rd',
     ]);
@@ -114,7 +118,7 @@ it('logs in a verified user successfully', function () {
     $response->assertStatus(200)
         ->assertJsonStructure(['success', 'data' => ['token']]);
 
-    $this->assertDatabaseHas('personal_access_tokens', [
+    assertDatabaseHas('personal_access_tokens', [
         'tokenable_id' => $user->id,
     ]);
 })->group('authentication');
@@ -125,7 +129,7 @@ it('fails login with incorrect password', function () {
         'email_verified_at' => now(),
     ]);
 
-    $response = $this->postJson("{$this->baseUrl}/login", [
+    $response = postJson(AUTH_BASE_URL.'/login', [
         'email' => $user->email,
         'password' => 'WrongP@ssw0rd',
     ]);
@@ -142,7 +146,7 @@ it('fails login for unverified user', function () {
         'email_verified_at' => null,
     ]);
 
-    $response = $this->postJson("{$this->baseUrl}/login", [
+    $response = postJson(AUTH_BASE_URL.'/login', [
         'email' => $user->email,
         'password' => 'SecUreP@ssw0rd',
     ]);
@@ -177,17 +181,17 @@ it('logs out an authenticated user', function () {
     $token = $user->createToken('api')->plainTextToken;
     $tokenModel = $user->tokens()->latest()->first();
 
-    $this->assertDatabaseHas('personal_access_tokens', [
+    assertDatabaseHas('personal_access_tokens', [
         'id' => $tokenModel->id,
     ]);
 
-    $response = $this->withHeader('Authorization', 'Bearer '.$token)
-        ->postJson("{$this->baseUrl}/logout");
+    $response = withHeader('Authorization', 'Bearer '.$token)
+        ->postJson(AUTH_BASE_URL.'/logout');
 
     $response->assertStatus(200)
         ->assertJson(['success' => true]);
 
-    $this->assertDatabaseMissing('personal_access_tokens', [
+    assertDatabaseMissing('personal_access_tokens', [
         'id' => $tokenModel->id,
     ]);
 })->group('authentication');
@@ -204,13 +208,13 @@ it('throttles registration attempts more than allowed', function () {
     ];
 
     $ip = '127.0.0.2';
-    $this->withServerVariables(['REMOTE_ADDR' => $ip])
-        ->postJson("{$this->baseUrl}/register", $payload);
-    $this->withServerVariables(['REMOTE_ADDR' => $ip])
-        ->postJson("{$this->baseUrl}/register", $payload);
+    withServerVariables(['REMOTE_ADDR' => $ip])
+        ->postJson(AUTH_BASE_URL.'/register', $payload);
+    withServerVariables(['REMOTE_ADDR' => $ip])
+        ->postJson(AUTH_BASE_URL.'/register', $payload);
 
-    $response = $this->withServerVariables(['REMOTE_ADDR' => $ip])
-        ->postJson("{$this->baseUrl}/register", $payload);
+    $response = withServerVariables(['REMOTE_ADDR' => $ip])
+        ->postJson(AUTH_BASE_URL.'/register', $payload);
 
     $response->assertStatus(422)
         ->assertJsonValidationErrors(['email']);
@@ -222,7 +226,7 @@ it('resends verification email for unverified user', function () {
         'email_verified_at' => null,
     ]);
 
-    $response = $this->postJson("{$this->baseUrl}/resend-verification", [
+    $response = postJson(AUTH_BASE_URL.'/resend-verification', [
         'email' => $user->email,
     ]);
 
@@ -241,13 +245,13 @@ it('throttles resend verification requests more than allowed', function () {
     ]);
 
     $ip = '127.0.0.3';
-    $this->withServerVariables(['REMOTE_ADDR' => $ip])
-        ->postJson("{$this->baseUrl}/resend-verification", ['email' => $user->email]);
-    $this->withServerVariables(['REMOTE_ADDR' => $ip])
-        ->postJson("{$this->baseUrl}/resend-verification", ['email' => $user->email]);
+    withServerVariables(['REMOTE_ADDR' => $ip])
+        ->postJson(AUTH_BASE_URL.'/resend-verification', ['email' => $user->email]);
+    withServerVariables(['REMOTE_ADDR' => $ip])
+        ->postJson(AUTH_BASE_URL.'/resend-verification', ['email' => $user->email]);
 
-    $response = $this->withServerVariables(['REMOTE_ADDR' => $ip])
-        ->postJson("{$this->baseUrl}/resend-verification", ['email' => $user->email]);
+    $response = withServerVariables(['REMOTE_ADDR' => $ip])
+        ->postJson(AUTH_BASE_URL.'/resend-verification', ['email' => $user->email]);
 
     $response->assertStatus(422)
         ->assertJsonValidationErrors(['email']);
@@ -263,7 +267,7 @@ it('verifies valid signed email link', function () {
     );
 
     // Use FULL signed URL with query params (?signature=...)
-    $response = $this->getJson($signedUrl);
+    $response = getJson($signedUrl);
 
     $response->assertStatus(200)
         ->assertJson(['success' => true]);
@@ -283,10 +287,10 @@ it('throttles verification attempts more than allowed', function () {
     );
 
     $ip = '127.0.0.4';
-    $this->withServerVariables(['REMOTE_ADDR' => $ip])->getJson($signedUrl);
-    $this->withServerVariables(['REMOTE_ADDR' => $ip])->getJson($signedUrl);
+    withServerVariables(['REMOTE_ADDR' => $ip])->getJson($signedUrl);
+    withServerVariables(['REMOTE_ADDR' => $ip])->getJson($signedUrl);
 
-    $response = $this->withServerVariables(['REMOTE_ADDR' => $ip])->getJson($signedUrl);
+    $response = withServerVariables(['REMOTE_ADDR' => $ip])->getJson($signedUrl);
 
     $response->assertStatus(422)
         ->assertJsonValidationErrors(['email']);
@@ -303,7 +307,7 @@ it('fails verification with invalid hash', function () {
         ['id' => $user->id, 'hash' => 'wronghash']
     );
 
-    $response = $this->getJson($signedUrl);
+    $response = getJson($signedUrl);
 
     $response->assertStatus(422)
         ->assertJsonValidationErrors(['token']);
@@ -320,7 +324,7 @@ it('fails verification for already verified user', function () {
         ['id' => $user->id, 'hash' => sha1($user->email)]
     );
 
-    $response = $this->getJson($signedUrl);
+    $response = getJson($signedUrl);
 
     $response->assertStatus(422)
         ->assertJsonValidationErrors(['email']);
@@ -333,7 +337,7 @@ it('fails verification with invalid user id', function () {
         ['id' => 999, 'hash' => sha1('missing@example.com')]
     );
 
-    $response = $this->getJson($signedUrl);
+    $response = getJson($signedUrl);
 
     $response->assertStatus(404);
 })->group('verification');

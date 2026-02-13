@@ -65,6 +65,9 @@ class AuthService
         }
 
         $user = Auth::user();
+        if (! $user instanceof User) {
+            throw ValidationException::withMessages(['email' => __('auth.failed')]);
+        }
 
         event(new Authenticated('api', $user));
 

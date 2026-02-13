@@ -86,7 +86,7 @@ class AuthService
         return ['user' => $user->makeVisible(['email']), 'token' => $token];
     }
 
-   
+
     /**
      * Log out a user from the application.
      *

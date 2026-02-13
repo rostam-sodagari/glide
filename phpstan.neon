@@ -6,3 +6,4 @@ parameters:
         - config
         - database
     level: 5
+    treatPhpDocTypesAsCertain: false
